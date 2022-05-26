@@ -67,10 +67,11 @@ pub fn parse(fname: &str) {
     let mut polygons = Matrix::new(0, 0);
     let mut cstack = vec![Matrix::new(0, 0); 0];
     let mut constants_store = HashMap::new();
-    let mut frames: u32 = 0;
     let mut basename = String::from("output");
     let mut vary_exists = false;
     let mut frames_exists = false;
+    let mut frames: Vec<HashMap<&str, f32>> = vec![HashMap::new(); 0];
+
     cstack.push(Matrix::identity());
     // to get the frame rate
     for pair in commands.clone() {
@@ -78,7 +79,7 @@ pub fn parse(fname: &str) {
             match command.as_rule(){
                 Rule::FRAMES_D => {
                     let mut command_contents = command.into_inner();
-                    frames = command_contents.next().unwrap().as_str().parse().expect("Not a valid frame rate");
+                    frames = vec![HashMap::new(); command_contents.next().unwrap().as_str().parse().expect("Not a valid frame count")];
                     frames_exists = true;
                 }
                 Rule::BASENAME_S => {
@@ -95,14 +96,40 @@ pub fn parse(fname: &str) {
             }
         }
     }
-    if vary_exists && !frames_exists{
-        println!("ERROR: vary used without frame numbers included");
-        return;
-    }
     // pass 1
-    // for pair in commands.clone() {
-    //     for command in 
-    // }
+    if vary_exists{
+        if !frames_exists{
+            println!("ERROR: vary used without frame numbers included");
+            return;
+        }else{
+            for pair in commands.clone() {
+                for command in pair {
+                    match command.as_rule() {
+                        Rule::VARY_SDDDD => {
+                            let mut command_contents = command.into_inner();
+                            let knob_name = command_contents.next().unwrap().as_str();
+                            let start_frame: u32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid start frame number");
+                            let end_frame: u32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid end frame number");
+                            if end_frame < start_frame {
+                                println!("ERROR: start frame number is greater than end frame number");
+                                return;
+                            }
+                            let start_value: f32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid start knob value");
+                            let end_value: f32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid end knob value");
+                            let frame_count = end_frame - start_frame;
+                            let mut current_value = start_value;
+                            let change_in_value = (end_value - start_value) / frame_count as f32;
+                            for frame_num in start_frame..=end_frame{
+                                frames[frame_num as usize].insert(knob_name, current_value);
+                                current_value += change_in_value;
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
     for pair in commands.clone() {
         for command in pair {
             // println!("{:?}", command.as_rule());
