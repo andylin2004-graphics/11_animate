@@ -1,7 +1,6 @@
 use crate::Color;
 use crate::Matrix;
 use crate::ReflectionValue;
-use crate::consts;
 use std::cmp;
 use std::ops::Add;
 

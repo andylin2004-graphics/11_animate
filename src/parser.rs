@@ -4,12 +4,11 @@ use crate::consts;
 use crate::image::Image;
 use crate::matrix::CurveType;
 use crate::matrix::Matrix;
-use crate::pest::{iterators::Pair, Parser};
+use crate::pest::Parser;
 use crate::ReflectionValue;
 use std::collections::HashMap;
-use std::fs;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Read};
+use std::io::{BufReader, Read};
 
 #[derive(Parser)]
 #[grammar = "mdl.pest"]
