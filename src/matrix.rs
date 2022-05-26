@@ -59,20 +59,27 @@ impl Matrix{
     }
     
     pub fn make_translate(x: i32, y: i32, z: i32) -> Matrix{
+        return Matrix::make_translate_with_scale(x,y,z,1.0);
+    }
+
+    pub fn make_translate_with_scale(x: i32, y: i32, z: i32, scale: f32) -> Matrix{
         let mut matrix = Matrix::identity();
-        matrix.matrix_array[0][3] = x as f32;
-        matrix.matrix_array[1][3] = y as f32;
-        matrix.matrix_array[2][3] = z as f32;
+        matrix.matrix_array[0][3] = x as f32 * scale;
+        matrix.matrix_array[1][3] = y as f32 * scale;
+        matrix.matrix_array[2][3] = z as f32 * scale;
         return matrix;
     }
     
-    pub fn make_scale( x: f32, y: f32, z: f32) -> Matrix{
+    pub fn make_scale_with_scale( x: f32, y: f32, z: f32, scale: f32) -> Matrix{
         let mut matrix = Matrix::identity();
-        matrix.matrix_array[0][0] = x as f32;
-        matrix.matrix_array[1][1] = y as f32;
-        matrix.matrix_array[2][2] = z as f32;
-        matrix.matrix_array[3][3] = 1.0;
+        matrix.matrix_array[0][0] = x * scale;
+        matrix.matrix_array[1][1] = y * scale;
+        matrix.matrix_array[2][2] = z * scale;
         return matrix;
+    }
+
+    pub fn make_scale( x: f32, y: f32, z: f32) -> Matrix{
+        return Matrix::make_scale_with_scale(x, y, z, 1.0);
     }
     
     pub fn make_rot_x(mut theta: f32 ) -> Matrix{
