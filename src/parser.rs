@@ -166,18 +166,12 @@ pub fn parse(fname: &str) {
                     }
                     Rule::MOVE_DDDS => {
                         let mut command_contents = command.into_inner();
-                        let mut rot = Matrix::make_translate(
+                        let mut rot = Matrix::make_translate_with_scale(
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
+                            *frames[frame_num].get(command_contents.next().unwrap().as_str()).expect("Knob name doesn't exist in the frames dictionary")
                         );
-                        let name = command_contents.next().unwrap().as_str();
-                        if frames[frame_num].contains_key(name){
-                            rot.multiply_by_num(*frames[frame_num].get(name).unwrap());
-                        }else{
-                            println!("ERROR: Knob name doesn't exist in the frames dictionary");
-                            return;
-                        }
                         rot.multiply_matrixes(&cstack.pop().unwrap());
                         cstack.push(rot);
                     }
@@ -219,12 +213,7 @@ pub fn parse(fname: &str) {
                         let rot_axis = command_contents.next().unwrap().as_str();
                         let mut rot_amount: f32 = command_contents.next().unwrap().as_str().parse().unwrap();
                         let name = command_contents.next().unwrap().as_str();
-                        if frames[frame_num].contains_key(name){
-                            rot_amount *= *frames[frame_num].get(name).unwrap();
-                        }else{
-                            println!("ERROR: Knob name doesn't exist in the frames dictionary");
-                            return;
-                        }
+                        rot_amount *= *frames[frame_num].get(name).expect("Knob name doesn't exist in the frames dictionary");
                         match rot_axis {
                             "x" => {
                                 let mut rot = Matrix::make_rot_x(rot_amount);
@@ -261,18 +250,12 @@ pub fn parse(fname: &str) {
                     }
                     Rule::SCALE_DDDS => {
                         let mut command_contents = command.into_inner();
-                        let mut scale = Matrix::make_scale(
+                        let mut scale = Matrix::make_scale_with_scale(
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
+                            *frames[frame_num].get(command_contents.next().unwrap().as_str()).unwrap()
                         );
-                        let name = command_contents.next().unwrap().as_str();
-                        if frames[frame_num].contains_key(name){
-                            scale.multiply_by_num(*frames[frame_num].get(name).unwrap());
-                        }else{
-                            println!("ERROR: Knob name doesn't exist in the frames dictionary");
-                            return;
-                        }
                         scale.multiply_matrixes(&cstack.pop().unwrap());
                         cstack.push(scale);
                     }
