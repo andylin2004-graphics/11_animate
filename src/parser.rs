@@ -453,13 +453,18 @@ pub fn parse(fname: &str) {
             }
         }
         if frames.len() > 1{
-            let filename = "animation/".to_owned() + &basename + frame_num.to_string().as_str() + ".ppm";
-            screen.create_file(&*filename);
-            screen.clear();
-            edges = Matrix::new(0, 0);
-            polygons = Matrix::new(0, 0);
-            cstack = vec![Matrix::new(0, 0); 0];
-            cstack.push(Matrix::identity());
+            render_reset_image_canvas(&basename, frame_num, &mut screen, &mut edges, &mut polygons, &mut cstack);
         }
     }
+}
+
+fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Image, edges: &mut Matrix, polygons: &mut Matrix, cstack: &mut Vec<Matrix>){
+    let filename = "animation/".to_owned() + &filename + frame_num.to_string().as_str() + ".ppm";
+    screen.create_file(&*filename);
+    println!("Rendering {}...", filename);
+    screen.clear();
+    *edges = Matrix::new(0, 0);
+    *polygons = Matrix::new(0, 0);
+    *cstack = vec![Matrix::new(0, 0); 0];
+    cstack.push(Matrix::identity());
 }
