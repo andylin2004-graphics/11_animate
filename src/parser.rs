@@ -131,7 +131,7 @@ pub fn parse(fname: &str) {
         }
     }
     // pass 2
-    for frame in &frames{
+    for frame_num in 0..frames.len(){
         for pair in commands.clone() {
             for command in pair {
                 // println!("{:?}", command.as_rule());
@@ -172,8 +172,8 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                         );
                         let name = command_contents.next().unwrap().as_str();
-                        if frame.contains_key(name){
-                            rot.multiply_by_num(*frame.get(name).unwrap());
+                        if frames[frame_num].contains_key(name){
+                            rot.multiply_by_num(*frames[frame_num].get(name).unwrap());
                         }else{
                             println!("ERROR: Knob name doesn't exist in the frames dictionary");
                             return;
@@ -219,8 +219,8 @@ pub fn parse(fname: &str) {
                         let rot_axis = command_contents.next().unwrap().as_str();
                         let mut rot_amount: f32 = command_contents.next().unwrap().as_str().parse().unwrap();
                         let name = command_contents.next().unwrap().as_str();
-                        if frame.contains_key(name){
-                            rot_amount *= *frame.get(name).unwrap();
+                        if frames[frame_num].contains_key(name){
+                            rot_amount *= *frames[frame_num].get(name).unwrap();
                         }else{
                             println!("ERROR: Knob name doesn't exist in the frames dictionary");
                             return;
@@ -267,8 +267,8 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                         );
                         let name = command_contents.next().unwrap().as_str();
-                        if frame.contains_key(name){
-                            scale.multiply_by_num(*frame.get(name).unwrap());
+                        if frames[frame_num].contains_key(name){
+                            scale.multiply_by_num(*frames[frame_num].get(name).unwrap());
                         }else{
                             println!("ERROR: Knob name doesn't exist in the frames dictionary");
                             return;
@@ -468,6 +468,11 @@ pub fn parse(fname: &str) {
                     }
                 }
             }
+        }
+        if frames.len() > 1{
+            let filename = "animation/".to_owned() + &basename + frame_num.to_string().as_str() + ".ppm";
+            screen.create_file(&*filename);
+            screen.clear();
         }
     }
     // println!("{:?}", constants_store);
