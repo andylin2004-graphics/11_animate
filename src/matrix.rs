@@ -15,6 +15,14 @@ impl Matrix{
     pub fn new(row: usize, col: usize) -> Matrix{
         Matrix{matrix_array: vec![vec![0.0; col]; row],}
     }
+
+    pub fn multiply_by_num(&mut self, multiply_by: f32){
+        for i in 0..self.matrix_array.len(){
+            for v in 0..self.matrix_array[i].len(){
+                self.matrix_array[i][v] *= multiply_by;
+            }
+        }
+    }
     
     /// multiply m1 by the object that this is called on, modifying this object to be the product
     /// 
