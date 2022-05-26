@@ -55,11 +55,11 @@ impl Constants {
     }
 }
 
-pub fn parse(fname: &str) -> io::Result<()> {
-    let file = File::open(&fname)?;
+pub fn parse(fname: &str) {
+    let file = File::open(&fname).expect("Unable to open file");
     let mut reader = BufReader::new(file);
     let mut instructions = String::new();
-    reader.read_to_string(&mut instructions);
+    reader.read_to_string(&mut instructions).expect("Unable to read file");
     let commands = MDLParser::parse(Rule::IDENT_LIST, &instructions);
     let mut screen = Image::new(500, 500);
     let color = Color::new_color(0, 255, 0);
@@ -67,8 +67,43 @@ pub fn parse(fname: &str) -> io::Result<()> {
     let mut polygons = Matrix::new(0, 0);
     let mut cstack = vec![Matrix::new(0, 0); 0];
     let mut constants_store = HashMap::new();
+    let mut frames: u32 = 0;
+    let mut basename = String::from("output");
+    let mut vary_exists = false;
+    let mut frames_exists = false;
     cstack.push(Matrix::identity());
-    for pair in commands {
+    // to get the frame rate
+    for pair in commands.clone() {
+        for command in pair {
+            match command.as_rule(){
+                Rule::FRAMES_D => {
+                    let mut command_contents = command.into_inner();
+                    frames = command_contents.next().unwrap().as_str().parse().expect("Not a valid frame rate");
+                    frames_exists = true;
+                }
+                Rule::BASENAME_S => {
+                    let mut command_contents = command.into_inner();
+                    basename = command_contents.next().unwrap().as_str().to_owned();
+                }
+                Rule::BASENAME => {
+                    println!("WARNING: a default basename will be used instead");
+                }
+                Rule::VARY_SDDDD => {
+                    vary_exists = true;
+                }
+                _ => {}
+            }
+        }
+    }
+    if vary_exists && !frames_exists{
+        println!("ERROR: vary used without frame numbers included");
+        return;
+    }
+    // pass 1
+    // for pair in commands.clone() {
+    //     for command in 
+    // }
+    for pair in commands.clone() {
         for command in pair {
             // println!("{:?}", command.as_rule());
             match command.as_rule() {
@@ -333,5 +368,4 @@ pub fn parse(fname: &str) -> io::Result<()> {
         }
     }
     // println!("{:?}", constants_store);
-    Ok(())
 }
