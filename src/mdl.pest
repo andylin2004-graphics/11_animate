@@ -79,7 +79,7 @@ ROTATE = _{"rotate"}
 ROTATE_SD = {ROTATE ~ STRING ~ DOUBLE}
 ROTATE_SDS = {ROTATE ~ STRING ~ DOUBLE ~ STRING}
 
-BASENAME = _{"basename"}
+BASENAME = {"basename"}
 BASENAME_S = {BASENAME ~ STRING}
 
 SAVE_KNOBS = _{"save_knobs"}
@@ -117,6 +117,8 @@ WEB = {"web"}
 IDENT_LIST = _{
     SOI ~ 
     ((
+        FRAMES_D |
+        VARY_SDDDD |
         LIGHT_SDDDDDD |
         CONSTANTS_SDDDDDDDDDDDD |
         CONSTANTS_SDDDDDDDDD |
@@ -153,6 +155,7 @@ IDENT_LIST = _{
         PPOP |
         TWEEN_DDSS |
         BASENAME_S |
+        BASENAME |
         SAVE_KNOBS_S |
         SCALE_DDDS |
         SCALE_DDD |
