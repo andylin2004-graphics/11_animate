@@ -84,7 +84,7 @@ pub fn parse(fname: &str) {
                 }
                 Rule::BASENAME_S => {
                     let mut command_contents = command.into_inner();
-                    basename = command_contents.next().unwrap().as_str().to_owned();
+                    basename = command_contents.nth(1).unwrap().as_str().to_owned();
                 }
                 Rule::BASENAME => {
                     println!("WARNING: a default basename will be used instead");
@@ -208,7 +208,7 @@ pub fn parse(fname: &str) {
                             }
                             _ => {
                                 panic!(
-                                    "Invalid input {} at 0 for rotation: please use x, y, or z.",
+                                    "ERROR: Invalid input {} at 0 for rotation: please use x, y, or z.",
                                     rot_axis
                                 );
                             }
@@ -243,7 +243,7 @@ pub fn parse(fname: &str) {
                             }
                             _ => {
                                 panic!(
-                                    "Invalid input {} at 0 for rotation: please use x, y, or z.",
+                                    "ERROR: Invalid input {} at 0 for rotation: please use x, y, or z.",
                                     rot_axis
                                 );
                             }
@@ -473,7 +473,10 @@ pub fn parse(fname: &str) {
             let filename = "animation/".to_owned() + &basename + frame_num.to_string().as_str() + ".ppm";
             screen.create_file(&*filename);
             screen.clear();
+            edges = Matrix::new(0, 0);
+            polygons = Matrix::new(0, 0);
+            cstack = vec![Matrix::new(0, 0); 0];
+            cstack.push(Matrix::identity());
         }
     }
-    // println!("{:?}", constants_store);
 }
