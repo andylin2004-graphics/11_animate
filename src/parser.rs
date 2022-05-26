@@ -70,7 +70,7 @@ pub fn parse(fname: &str) {
     let mut basename = String::from("output");
     let mut vary_exists = false;
     let mut frames_exists = false;
-    let mut frames: Vec<HashMap<&str, f32>> = vec![HashMap::new(); 0];
+    let mut frames: Vec<HashMap<&str, f32>> = vec![HashMap::new()];
 
     cstack.push(Matrix::identity());
     // to get the frame rate
@@ -130,266 +130,342 @@ pub fn parse(fname: &str) {
             }
         }
     }
-    for pair in commands.clone() {
-        for command in pair {
-            // println!("{:?}", command.as_rule());
-            match command.as_rule() {
-                Rule::CONSTANTS_SDDDDDDDDD => {
-                    let mut command_contents = command.into_inner();
-                    let name = command_contents.next().unwrap().as_str();
-                    let constant = Constants::new(command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), 0.0, 0.0, 0.0);
-                    constants_store.insert(name, constant);
-                }
-                // Rule::CONSTANTS_SDDDDDDDDDDDD => {
-                //     let mut command_contents = command.into_inner();
-                //     let name = command_contents.next().unwrap().as_str();
-                //     let constant = Constants::new(command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap());
-                //     constants_store.insert(name, constant);
-                // }
-                Rule::PPUSH => {
-                    cstack.push(cstack.last().unwrap().clone());
-                }
-                Rule::PPOP => {
-                    cstack.pop();
-                }
-                Rule::MOVE_DDD => {
-                    let mut command_contents = command.into_inner();
-                    let mut rot = Matrix::make_translate(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                    );
-                    rot.multiply_matrixes(&cstack.pop().unwrap());
-                    cstack.push(rot);
-                }
-                Rule::ROTATE_SD => {
-                    let mut command_contents = command.into_inner();
-                    let rot_axis = command_contents.next().unwrap().as_str();
-                    match rot_axis {
-                        "x" => {
-                            let mut rot = Matrix::make_rot_x(
-                                command_contents.next().unwrap().as_str().parse().unwrap(),
-                            );
-                            rot.multiply_matrixes(&cstack.pop().unwrap());
-                            cstack.push(rot);
+    // pass 2
+    for frame in &frames{
+        for pair in commands.clone() {
+            for command in pair {
+                // println!("{:?}", command.as_rule());
+                match command.as_rule() {
+                    Rule::CONSTANTS_SDDDDDDDDD => {
+                        let mut command_contents = command.into_inner();
+                        let name = command_contents.next().unwrap().as_str();
+                        let constant = Constants::new(command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), 0.0, 0.0, 0.0);
+                        constants_store.insert(name, constant);
+                    }
+                    // Rule::CONSTANTS_SDDDDDDDDDDDD => {
+                    //     let mut command_contents = command.into_inner();
+                    //     let name = command_contents.next().unwrap().as_str();
+                    //     let constant = Constants::new(command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap());
+                    //     constants_store.insert(name, constant);
+                    // }
+                    Rule::PPUSH => {
+                        cstack.push(cstack.last().unwrap().clone());
+                    }
+                    Rule::PPOP => {
+                        cstack.pop();
+                    }
+                    Rule::MOVE_DDD => {
+                        let mut command_contents = command.into_inner();
+                        let mut rot = Matrix::make_translate(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                        );
+                        rot.multiply_matrixes(&cstack.pop().unwrap());
+                        cstack.push(rot);
+                    }
+                    Rule::MOVE_DDDS => {
+                        let mut command_contents = command.into_inner();
+                        let mut rot = Matrix::make_translate(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                        );
+                        let name = command_contents.next().unwrap().as_str();
+                        if frame.contains_key(name){
+                            rot.multiply_by_num(*frame.get(name).unwrap());
+                        }else{
+                            println!("ERROR: Knob name doesn't exist in the frames dictionary");
+                            return;
                         }
-                        "y" => {
-                            let mut rot = Matrix::make_rot_y(
-                                command_contents.next().unwrap().as_str().parse().unwrap(),
-                            );
-                            rot.multiply_matrixes(&cstack.pop().unwrap());
-                            cstack.push(rot);
-                        }
-                        "z" => {
-                            let mut rot = Matrix::make_rot_z(
-                                command_contents.next().unwrap().as_str().parse().unwrap(),
-                            );
-                            rot.multiply_matrixes(&cstack.pop().unwrap());
-                            cstack.push(rot);
-                        }
-                        _ => {
-                            panic!(
-                                "Invalid input {} at 0 for rotation: please use x, y, or z.",
-                                rot_axis
-                            );
+                        rot.multiply_matrixes(&cstack.pop().unwrap());
+                        cstack.push(rot);
+                    }
+                    Rule::ROTATE_SD => {
+                        let mut command_contents = command.into_inner();
+                        let rot_axis = command_contents.next().unwrap().as_str();
+                        match rot_axis {
+                            "x" => {
+                                let mut rot = Matrix::make_rot_x(
+                                    command_contents.next().unwrap().as_str().parse().unwrap(),
+                                );
+                                rot.multiply_matrixes(&cstack.pop().unwrap());
+                                cstack.push(rot);
+                            }
+                            "y" => {
+                                let mut rot = Matrix::make_rot_y(
+                                    command_contents.next().unwrap().as_str().parse().unwrap(),
+                                );
+                                rot.multiply_matrixes(&cstack.pop().unwrap());
+                                cstack.push(rot);
+                            }
+                            "z" => {
+                                let mut rot = Matrix::make_rot_z(
+                                    command_contents.next().unwrap().as_str().parse().unwrap(),
+                                );
+                                rot.multiply_matrixes(&cstack.pop().unwrap());
+                                cstack.push(rot);
+                            }
+                            _ => {
+                                panic!(
+                                    "Invalid input {} at 0 for rotation: please use x, y, or z.",
+                                    rot_axis
+                                );
+                            }
                         }
                     }
-                }
-                Rule::SCALE_DDD => {
-                    let mut command_contents = command.into_inner();
-                    let mut scale = Matrix::make_scale(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                    );
-                    scale.multiply_matrixes(&cstack.pop().unwrap());
-                    cstack.push(scale);
-                }
-                Rule::SPHERE_SDDDD => {
-                    // println!("{:?}", command);
-                    let mut command_contents = command.into_inner();
-                    let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
-                    polygons.add_sphere(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        consts::STEP_3D,
-                    );
-                    polygons.multiply_matrixes(cstack.last().unwrap());
-                    screen.draw_polygons(
-                        &polygons,
-                        &color,
-                        &mut consts::VIEW.to_vec(),
-                        &consts::AMBIENT_COLOR,
-                        &mut consts::POINT_LIGHT_LOCATION.to_vec(),
-                        &consts::POINT_LIGHT_COLOR,
-                        &lighting_constants.ambient_reflect,
-                        &lighting_constants.diffuse_reflect,
-                        &lighting_constants.specular_reflect
-                    );
-
-                    polygons = Matrix::new(0, 0);
-                }
-                Rule::SPHERE_DDDD => {
-                    let mut command_contents = command.into_inner();
-                    polygons.add_sphere(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        consts::STEP_3D,
-                    );
-                    polygons.multiply_matrixes(cstack.last().unwrap());
-                    screen.draw_polygons(
-                        &polygons,
-                        &color,
-                        &mut consts::VIEW.to_vec(),
-                        &consts::AMBIENT_COLOR,
-                        &mut consts::POINT_LIGHT_LOCATION.to_vec(),
-                        &consts::POINT_LIGHT_COLOR,
-                        &consts::AMBIENT_REFLECT,
-                        &consts::DIFFUSE_REFLECT,
-                        &consts::SPECULAR_REFLECT
-                    );
-
-                    polygons = Matrix::new(0, 0);
-                }
-                Rule::BOX_SDDDDDD => {
-                    let mut command_contents = command.into_inner();
-                    let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
-                    polygons.add_box(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap()
-                    );
-                    polygons.multiply_matrixes(cstack.last().unwrap());
-
-                    screen.draw_polygons(
-                        &polygons,
-                        &color,
-                        &mut consts::VIEW.to_vec(),
-                        &consts::AMBIENT_COLOR,
-                        &mut consts::POINT_LIGHT_LOCATION.to_vec(),
-                        &consts::POINT_LIGHT_COLOR,
-                        &lighting_constants.ambient_reflect,
-                        &lighting_constants.diffuse_reflect,
-                        &lighting_constants.specular_reflect
-                    );
-
-                    polygons = Matrix::new(0, 0);
-                }
-                Rule::BOX_DDDDDD => {
-                    let mut command_contents = command.into_inner();
-                    polygons.add_box(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap()
-                    );
-                    polygons.multiply_matrixes(cstack.last().unwrap());
-                    screen.draw_polygons(
-                        &polygons,
-                        &color,
-                        &mut consts::VIEW.to_vec(),
-                        &consts::AMBIENT_COLOR,
-                        &mut consts::POINT_LIGHT_LOCATION.to_vec(),
-                        &consts::POINT_LIGHT_COLOR,
-                        &consts::AMBIENT_REFLECT,
-                        &consts::DIFFUSE_REFLECT,
-                        &consts::SPECULAR_REFLECT
-                    );
-
-                    polygons = Matrix::new(0, 0);
-                }
-                Rule::TORUS_SDDDDD => {
-                    let mut command_contents = command.into_inner();
-                    let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
-                    polygons.add_torus(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        consts::STEP_3D
-                    );
-                    polygons.multiply_matrixes(cstack.last().unwrap());
-                    screen.draw_polygons(
-                        &polygons,
-                        &color,
-                        &mut consts::VIEW.to_vec(),
-                        &consts::AMBIENT_COLOR,
-                        &mut consts::POINT_LIGHT_LOCATION.to_vec(),
-                        &consts::POINT_LIGHT_COLOR,
-                        &lighting_constants.ambient_reflect,
-                        &lighting_constants.diffuse_reflect,
-                        &lighting_constants.specular_reflect
-                    );
-
-                    polygons = Matrix::new(0, 0);
-                }
-                Rule::TORUS_DDDDD => {
-                    let mut command_contents = command.into_inner();
-                    polygons.add_torus(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        consts::STEP_3D
-                    );
-                    polygons.multiply_matrixes(cstack.last().unwrap());
-                    screen.draw_polygons(
-                        &polygons,
-                        &color,
-                        &mut consts::VIEW.to_vec(),
-                        &consts::AMBIENT_COLOR,
-                        &mut consts::POINT_LIGHT_LOCATION.to_vec(),
-                        &consts::POINT_LIGHT_COLOR,
-                        &consts::AMBIENT_REFLECT,
-                        &consts::DIFFUSE_REFLECT,
-                        &consts::SPECULAR_REFLECT
-                    );
-
-                    polygons = Matrix::new(0, 0);
-                }
-                Rule::DISPLAY => {
-                    screen.display();
-                }
-                Rule::SAVE_S => {
-                    let mut command_contents = command.into_inner();
-                    let filename = command_contents.next().unwrap().as_str();
-                    screen.create_file(filename);
-                    Command::new("magick")
-                        .arg("convert")
-                        .arg(filename)
-                        .arg(filename)
-                        .spawn()
-                        .expect("failed to convert image to desired format");
-                }
-                Rule::LINE_DDDDDD => {
-                    let mut command_contents = command.into_inner();
-                    edges.add_edge(
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                        command_contents.next().unwrap().as_str().parse().unwrap(),
-                    );
-                    edges.multiply_matrixes(cstack.last().unwrap());
-                    screen.draw_lines(&edges, &color);
+                    Rule::ROTATE_SDS => {
+                        let mut command_contents = command.into_inner();
+                        let rot_axis = command_contents.next().unwrap().as_str();
+                        let mut rot_amount: f32 = command_contents.next().unwrap().as_str().parse().unwrap();
+                        let name = command_contents.next().unwrap().as_str();
+                        if frame.contains_key(name){
+                            rot_amount *= *frame.get(name).unwrap();
+                        }else{
+                            println!("ERROR: Knob name doesn't exist in the frames dictionary");
+                            return;
+                        }
+                        match rot_axis {
+                            "x" => {
+                                let mut rot = Matrix::make_rot_x(rot_amount);
+                                rot.multiply_matrixes(&cstack.pop().unwrap());
+                                cstack.push(rot);
+                            }
+                            "y" => {
+                                let mut rot = Matrix::make_rot_y(rot_amount);
+                                rot.multiply_matrixes(&cstack.pop().unwrap());
+                                cstack.push(rot);
+                            }
+                            "z" => {
+                                let mut rot = Matrix::make_rot_z(rot_amount);
+                                rot.multiply_matrixes(&cstack.pop().unwrap());
+                                cstack.push(rot);
+                            }
+                            _ => {
+                                panic!(
+                                    "Invalid input {} at 0 for rotation: please use x, y, or z.",
+                                    rot_axis
+                                );
+                            }
+                        }
+                    }
+                    Rule::SCALE_DDD => {
+                        let mut command_contents = command.into_inner();
+                        let mut scale = Matrix::make_scale(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                        );
+                        scale.multiply_matrixes(&cstack.pop().unwrap());
+                        cstack.push(scale);
+                    }
+                    Rule::SCALE_DDDS => {
+                        let mut command_contents = command.into_inner();
+                        let mut scale = Matrix::make_scale(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                        );
+                        let name = command_contents.next().unwrap().as_str();
+                        if frame.contains_key(name){
+                            scale.multiply_by_num(*frame.get(name).unwrap());
+                        }else{
+                            println!("ERROR: Knob name doesn't exist in the frames dictionary");
+                            return;
+                        }
+                        scale.multiply_matrixes(&cstack.pop().unwrap());
+                        cstack.push(scale);
+                    }
+                    Rule::SPHERE_SDDDD => {
+                        // println!("{:?}", command);
+                        let mut command_contents = command.into_inner();
+                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
+                        polygons.add_sphere(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            consts::STEP_3D,
+                        );
+                        polygons.multiply_matrixes(cstack.last().unwrap());
+                        screen.draw_polygons(
+                            &polygons,
+                            &color,
+                            &mut consts::VIEW.to_vec(),
+                            &consts::AMBIENT_COLOR,
+                            &mut consts::POINT_LIGHT_LOCATION.to_vec(),
+                            &consts::POINT_LIGHT_COLOR,
+                            &lighting_constants.ambient_reflect,
+                            &lighting_constants.diffuse_reflect,
+                            &lighting_constants.specular_reflect
+                        );
     
-                    edges = Matrix::new(0, 0);
-                }
-                Rule::EOI => {}
-                _ => {
-                    println!("{:?} was not implemented :/", command.as_rule());
+                        polygons = Matrix::new(0, 0);
+                    }
+                    Rule::SPHERE_DDDD => {
+                        let mut command_contents = command.into_inner();
+                        polygons.add_sphere(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            consts::STEP_3D,
+                        );
+                        polygons.multiply_matrixes(cstack.last().unwrap());
+                        screen.draw_polygons(
+                            &polygons,
+                            &color,
+                            &mut consts::VIEW.to_vec(),
+                            &consts::AMBIENT_COLOR,
+                            &mut consts::POINT_LIGHT_LOCATION.to_vec(),
+                            &consts::POINT_LIGHT_COLOR,
+                            &consts::AMBIENT_REFLECT,
+                            &consts::DIFFUSE_REFLECT,
+                            &consts::SPECULAR_REFLECT
+                        );
+    
+                        polygons = Matrix::new(0, 0);
+                    }
+                    Rule::BOX_SDDDDDD => {
+                        let mut command_contents = command.into_inner();
+                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
+                        polygons.add_box(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap()
+                        );
+                        polygons.multiply_matrixes(cstack.last().unwrap());
+    
+                        screen.draw_polygons(
+                            &polygons,
+                            &color,
+                            &mut consts::VIEW.to_vec(),
+                            &consts::AMBIENT_COLOR,
+                            &mut consts::POINT_LIGHT_LOCATION.to_vec(),
+                            &consts::POINT_LIGHT_COLOR,
+                            &lighting_constants.ambient_reflect,
+                            &lighting_constants.diffuse_reflect,
+                            &lighting_constants.specular_reflect
+                        );
+    
+                        polygons = Matrix::new(0, 0);
+                    }
+                    Rule::BOX_DDDDDD => {
+                        let mut command_contents = command.into_inner();
+                        polygons.add_box(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap()
+                        );
+                        polygons.multiply_matrixes(cstack.last().unwrap());
+                        screen.draw_polygons(
+                            &polygons,
+                            &color,
+                            &mut consts::VIEW.to_vec(),
+                            &consts::AMBIENT_COLOR,
+                            &mut consts::POINT_LIGHT_LOCATION.to_vec(),
+                            &consts::POINT_LIGHT_COLOR,
+                            &consts::AMBIENT_REFLECT,
+                            &consts::DIFFUSE_REFLECT,
+                            &consts::SPECULAR_REFLECT
+                        );
+    
+                        polygons = Matrix::new(0, 0);
+                    }
+                    Rule::TORUS_SDDDDD => {
+                        let mut command_contents = command.into_inner();
+                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
+                        polygons.add_torus(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            consts::STEP_3D
+                        );
+                        polygons.multiply_matrixes(cstack.last().unwrap());
+                        screen.draw_polygons(
+                            &polygons,
+                            &color,
+                            &mut consts::VIEW.to_vec(),
+                            &consts::AMBIENT_COLOR,
+                            &mut consts::POINT_LIGHT_LOCATION.to_vec(),
+                            &consts::POINT_LIGHT_COLOR,
+                            &lighting_constants.ambient_reflect,
+                            &lighting_constants.diffuse_reflect,
+                            &lighting_constants.specular_reflect
+                        );
+    
+                        polygons = Matrix::new(0, 0);
+                    }
+                    Rule::TORUS_DDDDD => {
+                        let mut command_contents = command.into_inner();
+                        polygons.add_torus(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            consts::STEP_3D
+                        );
+                        polygons.multiply_matrixes(cstack.last().unwrap());
+                        screen.draw_polygons(
+                            &polygons,
+                            &color,
+                            &mut consts::VIEW.to_vec(),
+                            &consts::AMBIENT_COLOR,
+                            &mut consts::POINT_LIGHT_LOCATION.to_vec(),
+                            &consts::POINT_LIGHT_COLOR,
+                            &consts::AMBIENT_REFLECT,
+                            &consts::DIFFUSE_REFLECT,
+                            &consts::SPECULAR_REFLECT
+                        );
+    
+                        polygons = Matrix::new(0, 0);
+                    }
+                    Rule::DISPLAY => {
+                        if frames.len() <= 1{
+                            screen.display();
+                        }
+                    }
+                    Rule::SAVE_S => {
+                        if frames.len() <= 1{
+                            let mut command_contents = command.into_inner();
+                            let filename = command_contents.next().unwrap().as_str();
+                            screen.create_file(filename);
+                            Command::new("magick")
+                                .arg("convert")
+                                .arg(filename)
+                                .arg(filename)
+                                .spawn()
+                                .expect("failed to convert image to desired format");
+                        }
+                    }
+                    Rule::LINE_DDDDDD => {
+                        let mut command_contents = command.into_inner();
+                        edges.add_edge(
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                        );
+                        edges.multiply_matrixes(cstack.last().unwrap());
+                        screen.draw_lines(&edges, &color);
+        
+                        edges = Matrix::new(0, 0);
+                    }
+                    Rule::EOI | Rule::VARY_SDDDD | Rule::BASENAME_S | Rule::BASENAME | Rule::FRAMES_D => {}
+                    _ => {
+                        println!("{:?} was not implemented :/", command.as_rule());
+                    }
                 }
             }
         }
