@@ -37,6 +37,6 @@ fn main() {
     if args.len() > 1 && args[1] == "art"{
         parse("coloredbot.mdl");
     }else{
-        parse("face.mdl");
+        parse("simple_anim.mdl");
     }
 }
