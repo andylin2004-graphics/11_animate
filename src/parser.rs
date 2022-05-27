@@ -1,7 +1,7 @@
 use std::process::Command;
 use crate::color::Color;
 use crate::consts;
-use crate::image::Image;
+use crate::image::{Image, make_animation};
 use crate::matrix::CurveType;
 use crate::matrix::Matrix;
 use crate::pest::Parser;
@@ -59,6 +59,7 @@ pub fn parse(fname: &str) {
     let mut reader = BufReader::new(file);
     let mut instructions = String::new();
     reader.read_to_string(&mut instructions).expect("Unable to read file");
+    
     let commands = MDLParser::parse(Rule::IDENT_LIST, &instructions);
     let mut screen = Image::new(500, 500);
     let color = Color::new_color(0, 255, 0);
@@ -410,6 +411,9 @@ pub fn parse(fname: &str) {
         if frames.len() > 1{
             render_reset_image_canvas(&basename, frame_num, &mut screen, &mut edges, &mut polygons, &mut cstack);
         }
+    }
+    if frames.len() > 1{
+        make_animation(basename);
     }
 }
 
