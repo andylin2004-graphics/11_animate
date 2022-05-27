@@ -418,7 +418,7 @@ pub fn parse(fname: &str) {
 }
 
 fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Image, edges: &mut Matrix, polygons: &mut Matrix, cstack: &mut Vec<Matrix>){
-    let filename = "animation/".to_owned() + &filename + frame_num.to_string().as_str() + ".ppm";
+    let filename = "animation/".to_owned() + &filename + &*format!("{:04}", frame_num) + ".ppm";
     screen.create_file(&*filename);
     println!("Rendering {}...", filename);
     screen.clear();
