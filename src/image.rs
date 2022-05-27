@@ -90,11 +90,12 @@ impl Image {
     }
 }
 
-pub fn make_animation(name: &str){
+pub fn make_animation(name: String){
     Command::new("convert")
-        .arg("-delay 10")
-        .arg("animations/".to_owned()+name)
-        .arg(name.to_owned()+".gif")
+        .arg("-delay")
+        .arg("1.7")
+        .arg("animation/".to_owned()+&name+"*")
+        .arg(name+".gif")
         .spawn()
         .expect("ERROR: unable to convert a series of images to a gif");
 }
