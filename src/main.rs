@@ -7,6 +7,7 @@ mod parser;
 mod reflect;
 use color::Color;
 use image::Image;
+use std::time::Instant;
 use matrix::CurveType;
 use matrix::Matrix;
 use parser::parse;
@@ -37,6 +38,8 @@ fn main() {
     if args.len() > 1 && args[1] == "art"{
         parse("coloredbot.mdl");
     }else{
+        let time = Instant::now();
         parse("simple_anim.mdl");
+        println!("Render finished in {:?}", time.elapsed())
     }
 }
