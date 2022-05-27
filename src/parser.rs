@@ -155,18 +155,18 @@ pub fn parse(fname: &str) {
                     }
                     Rule::MOVE_DDD | Rule::MOVE_DDDS => {
                         let mut command_contents = command.into_inner();
-                        let mut rot = Matrix::make_translate_with_scale(
+                        let mut translate = Matrix::make_translate_with_scale(
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
-                            if let Some(e) = command_contents.next(){
-                                *frames[frame_num].get(&*e.as_str()).unwrap()
+                            if let Some(knob_name) = command_contents.next(){
+                                *frames[frame_num].get(&*knob_name.as_str()).unwrap()
                             }else{
                                 1.0
                             }
                         );
-                        rot.multiply_matrixes(&cstack.pop().unwrap());
-                        cstack.push(rot);
+                        translate.multiply_matrixes(&cstack.pop().unwrap());
+                        cstack.push(translate);
                     }
                     Rule::ROTATE_SD | Rule::ROTATE_SDS => {
                         let mut command_contents = command.into_inner();
