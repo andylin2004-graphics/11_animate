@@ -72,6 +72,7 @@ pub fn parse(fname: &str) {
     let mut frames_exists = false;
     let mut frames: Vec<HashMap<&str, f32>> = vec![HashMap::new()];
 
+    clean_animation_directory();
     cstack.push(Matrix::identity());
     // to get the frame rate
     for pair in commands.clone() {
@@ -426,4 +427,11 @@ fn render_reset_image_canvas(filename: &str, frame_num: usize, screen: &mut Imag
     *polygons = Matrix::new(0, 0);
     *cstack = vec![Matrix::new(0, 0); 0];
     cstack.push(Matrix::identity());
+}
+
+fn clean_animation_directory(){
+    Command::new("make")
+        .arg("clean_anim")
+        .spawn()
+        .expect("ERROR: unable to delete files");
 }
