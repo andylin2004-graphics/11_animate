@@ -199,23 +199,17 @@ pub fn parse(fname: &str) {
                             }
                         }
                     }
-                    Rule::SCALE_DDD => {
-                        let mut command_contents = command.into_inner();
-                        let mut scale = Matrix::make_scale(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                        );
-                        scale.multiply_matrixes(&cstack.pop().unwrap());
-                        cstack.push(scale);
-                    }
-                    Rule::SCALE_DDDS => {
+                    Rule::SCALE_DDD | Rule::SCALE_DDDS => {
                         let mut command_contents = command.into_inner();
                         let mut scale = Matrix::make_scale_with_scale(
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
                             command_contents.next().unwrap().as_str().parse().unwrap(),
-                            *frames[frame_num].get(command_contents.next().unwrap().as_str()).unwrap()
+                            if let Some(knob_name) = command_contents.next(){
+                                *frames[frame_num].get(&*knob_name.as_str()).unwrap()
+                            }else{
+                                1.0
+                            }
                         );
                         scale.multiply_matrixes(&cstack.pop().unwrap());
                         cstack.push(scale);
