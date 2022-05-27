@@ -168,45 +168,13 @@ pub fn parse(fname: &str) {
                         rot.multiply_matrixes(&cstack.pop().unwrap());
                         cstack.push(rot);
                     }
-                    Rule::ROTATE_SD => {
-                        let mut command_contents = command.into_inner();
-                        let rot_axis = command_contents.next().unwrap().as_str();
-                        match rot_axis {
-                            "x" => {
-                                let mut rot = Matrix::make_rot_x(
-                                    command_contents.next().unwrap().as_str().parse().unwrap(),
-                                );
-                                rot.multiply_matrixes(&cstack.pop().unwrap());
-                                cstack.push(rot);
-                            }
-                            "y" => {
-                                let mut rot = Matrix::make_rot_y(
-                                    command_contents.next().unwrap().as_str().parse().unwrap(),
-                                );
-                                rot.multiply_matrixes(&cstack.pop().unwrap());
-                                cstack.push(rot);
-                            }
-                            "z" => {
-                                let mut rot = Matrix::make_rot_z(
-                                    command_contents.next().unwrap().as_str().parse().unwrap(),
-                                );
-                                rot.multiply_matrixes(&cstack.pop().unwrap());
-                                cstack.push(rot);
-                            }
-                            _ => {
-                                panic!(
-                                    "ERROR: Invalid input {} at 0 for rotation: please use x, y, or z.",
-                                    rot_axis
-                                );
-                            }
-                        }
-                    }
-                    Rule::ROTATE_SDS => {
+                    Rule::ROTATE_SD | Rule::ROTATE_SDS => {
                         let mut command_contents = command.into_inner();
                         let rot_axis = command_contents.next().unwrap().as_str();
                         let mut rot_amount: f32 = command_contents.next().unwrap().as_str().parse().unwrap();
-                        let name = command_contents.next().unwrap().as_str();
-                        rot_amount *= *frames[frame_num].get(name).expect("Knob name doesn't exist in the frames dictionary");
+                        if let Some(knob_name) = command_contents.next(){
+                            rot_amount *= *frames[frame_num].get(knob_name.as_str()).unwrap();
+                        }
                         match rot_axis {
                             "x" => {
                                 let mut rot = Matrix::make_rot_x(rot_amount);
