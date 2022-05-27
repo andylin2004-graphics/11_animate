@@ -89,3 +89,12 @@ impl Image {
             .expect("failed to open image");
     }
 }
+
+pub fn make_animation(name: &str){
+    Command::new("convert")
+        .arg("-delay 10")
+        .arg("animations/".to_owned()+name)
+        .arg(name.to_owned()+".gif")
+        .spawn()
+        .expect("ERROR: unable to convert a series of images to a gif");
+}
