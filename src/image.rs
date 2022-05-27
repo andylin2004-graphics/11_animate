@@ -91,6 +91,7 @@ impl Image {
 }
 
 pub fn make_animation(name: String){
+    println!("Rendering gif...");
     Command::new("convert")
         .arg("-delay")
         .arg("1.7")
