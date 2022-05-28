@@ -81,7 +81,7 @@ pub fn parse(fname: &str) {
             match command.as_rule(){
                 Rule::FRAMES_D => {
                     let mut command_contents = command.into_inner();
-                    frames = vec![HashMap::new(); command_contents.next().unwrap().as_str().parse().expect(format!("ERROR: Not a valid frame count at {}", error_message))];
+                    frames = vec![HashMap::new(); command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid frame count at {}", error_message))];
                     frames_exists = true;
                 }
                 Rule::BASENAME_S => {
@@ -137,18 +137,18 @@ pub fn parse(fname: &str) {
     for frame_num in 0..frames.len(){
         for pair in commands.clone() {
             for command in pair {
-                // println!("{:?}", command.as_rule());
+                let error_message = command.as_str();
                 match command.as_rule() {
                     Rule::CONSTANTS_SDDDDDDDDD => {
                         let mut command_contents = command.into_inner();
                         let name = command_contents.next().unwrap().as_str();
-                        let constant = Constants::new(command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), 0.0, 0.0, 0.0);
+                        let constant = Constants::new(command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), 0.0, 0.0, 0.0);
                         constants_store.insert(name, constant);
                     }
                     // Rule::CONSTANTS_SDDDDDDDDDDDD => {
                     //     let mut command_contents = command.into_inner();
                     //     let name = command_contents.next().unwrap().as_str();
-                    //     let constant = Constants::new(command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap(), command_contents.next().unwrap().as_str().parse().unwrap());
+                    //     let constant = Constants::new(command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message), command_contents.next().unwrap().as_str().parse().expect(error_message));
                     //     constants_store.insert(name, constant);
                     // }
                     Rule::PPUSH => {
@@ -160,9 +160,9 @@ pub fn parse(fname: &str) {
                     Rule::MOVE_DDD | Rule::MOVE_DDDS => {
                         let mut command_contents = command.into_inner();
                         let mut translate = Matrix::make_translate_with_scale(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
                             if let Some(knob_name) = command_contents.next(){
                                 *frames[frame_num].get(&*knob_name.as_str()).unwrap()
                             }else{
@@ -175,7 +175,7 @@ pub fn parse(fname: &str) {
                     Rule::ROTATE_SD | Rule::ROTATE_SDS => {
                         let mut command_contents = command.into_inner();
                         let rot_axis = command_contents.next().unwrap().as_str();
-                        let mut rot_amount: f32 = command_contents.next().unwrap().as_str().parse().unwrap();
+                        let mut rot_amount: f32 = command_contents.next().unwrap().as_str().parse().expect(error_message);
                         if let Some(knob_name) = command_contents.next(){
                             rot_amount *= *frames[frame_num].get(knob_name.as_str()).unwrap();
                         }
@@ -206,9 +206,9 @@ pub fn parse(fname: &str) {
                     Rule::SCALE_DDD | Rule::SCALE_DDDS => {
                         let mut command_contents = command.into_inner();
                         let mut scale = Matrix::make_scale_with_scale(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
                             if let Some(knob_name) = command_contents.next(){
                                 *frames[frame_num].get(&*knob_name.as_str()).unwrap()
                             }else{
@@ -223,10 +223,10 @@ pub fn parse(fname: &str) {
                         let mut command_contents = command.into_inner();
                         let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
                         polygons.add_sphere(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D,
                         );
                         polygons.multiply_matrixes(cstack.last().unwrap());
@@ -247,10 +247,10 @@ pub fn parse(fname: &str) {
                     Rule::SPHERE_DDDD => {
                         let mut command_contents = command.into_inner();
                         polygons.add_sphere(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D,
                         );
                         polygons.multiply_matrixes(cstack.last().unwrap());
@@ -272,12 +272,12 @@ pub fn parse(fname: &str) {
                         let mut command_contents = command.into_inner();
                         let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
                         polygons.add_box(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap()
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message)
                         );
                         polygons.multiply_matrixes(cstack.last().unwrap());
     
@@ -298,12 +298,12 @@ pub fn parse(fname: &str) {
                     Rule::BOX_DDDDDD => {
                         let mut command_contents = command.into_inner();
                         polygons.add_box(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap()
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message)
                         );
                         polygons.multiply_matrixes(cstack.last().unwrap());
                         screen.draw_polygons(
@@ -324,11 +324,11 @@ pub fn parse(fname: &str) {
                         let mut command_contents = command.into_inner();
                         let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
                         polygons.add_torus(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D
                         );
                         polygons.multiply_matrixes(cstack.last().unwrap());
@@ -349,11 +349,11 @@ pub fn parse(fname: &str) {
                     Rule::TORUS_DDDDD => {
                         let mut command_contents = command.into_inner();
                         polygons.add_torus(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
                             consts::STEP_3D
                         );
                         polygons.multiply_matrixes(cstack.last().unwrap());
@@ -392,12 +392,12 @@ pub fn parse(fname: &str) {
                     Rule::LINE_DDDDDD => {
                         let mut command_contents = command.into_inner();
                         edges.add_edge(
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
-                            command_contents.next().unwrap().as_str().parse().unwrap(),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
+                            command_contents.next().unwrap().as_str().parse().expect(error_message),
                         );
                         edges.multiply_matrixes(cstack.last().unwrap());
                         screen.draw_lines(&edges, &color);
