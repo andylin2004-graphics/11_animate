@@ -77,10 +77,11 @@ pub fn parse(fname: &str) {
     // to get the frame rate
     for pair in commands.clone() {
         for command in pair {
+            let error_message = command.as_str();
             match command.as_rule(){
                 Rule::FRAMES_D => {
                     let mut command_contents = command.into_inner();
-                    frames = vec![HashMap::new(); command_contents.next().unwrap().as_str().parse().expect("Not a valid frame count")];
+                    frames = vec![HashMap::new(); command_contents.next().unwrap().as_str().parse().expect(format!("ERROR: Not a valid frame count at {}", error_message))];
                     frames_exists = true;
                 }
                 Rule::BASENAME_S => {
@@ -88,7 +89,7 @@ pub fn parse(fname: &str) {
                     basename = command_contents.nth(1).unwrap().as_str().to_owned();
                 }
                 Rule::BASENAME => {
-                    println!("WARNING: a default basename will be used instead");
+                    println!("WARNING: a default basename will be used instead because basename is missing at {}", error_message);
                 }
                 Rule::VARY_SDDDD => {
                     vary_exists = true;
@@ -105,18 +106,19 @@ pub fn parse(fname: &str) {
         }else{
             for pair in commands.clone() {
                 for command in pair {
+                    let error_message = command.as_str();
                     match command.as_rule() {
                         Rule::VARY_SDDDD => {
                             let mut command_contents = command.into_inner();
                             let knob_name = command_contents.next().unwrap().as_str();
-                            let start_frame: u32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid start frame number");
-                            let end_frame: u32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid end frame number");
+                            let start_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid start frame number at {}", error_message));
+                            let end_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid end frame number at {}", error_message));
                             if end_frame < start_frame {
-                                println!("ERROR: start frame number is greater than end frame number");
+                                println!("ERROR: start frame number is greater than end frame number at {}", error_message);
                                 return;
                             }
-                            let start_value: f32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid start knob value");
-                            let end_value: f32 = command_contents.next().unwrap().as_str().parse().expect("Not a valid end knob value");
+                            let start_value: f32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid start knob value at {}", error_message));
+                            let end_value: f32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid end knob value at {}", error_message));
                             let frame_count = end_frame - start_frame;
                             let mut current_value = start_value;
                             let change_in_value = (end_value - start_value) / frame_count as f32;
