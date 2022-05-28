@@ -81,7 +81,7 @@ pub fn parse(fname: &str) {
             match command.as_rule(){
                 Rule::FRAMES_D => {
                     let mut command_contents = command.into_inner();
-                    frames = vec![HashMap::new(); command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid frame count at {}", error_message))];
+                    frames = vec![HashMap::new(); command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid frame count at {}", error_message))];
                     frames_exists = true;
                 }
                 Rule::BASENAME_S => {
@@ -111,14 +111,14 @@ pub fn parse(fname: &str) {
                         Rule::VARY_SDDDD => {
                             let mut command_contents = command.into_inner();
                             let knob_name = command_contents.next().unwrap().as_str();
-                            let start_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid start frame number at {}", error_message));
-                            let end_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid end frame number at {}", error_message));
+                            let start_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start frame number at {}", error_message));
+                            let end_frame: u32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid end frame number at {}", error_message));
                             if end_frame < start_frame {
                                 println!("ERROR: start frame number is greater than end frame number at {}", error_message);
                                 return;
                             }
-                            let start_value: f32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid start knob value at {}", error_message));
-                            let end_value: f32 = command_contents.next().unwrap().as_str().parse().expect(format!("Not a valid end knob value at {}", error_message));
+                            let start_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid start knob value at {}", error_message));
+                            let end_value: f32 = command_contents.next().unwrap().as_str().parse().expect(&*format!("Not a valid end knob value at {}", error_message));
                             let frame_count = end_frame - start_frame;
                             let mut current_value = start_value;
                             let change_in_value = (end_value - start_value) / frame_count as f32;
@@ -197,8 +197,8 @@ pub fn parse(fname: &str) {
                             }
                             _ => {
                                 panic!(
-                                    "ERROR: Invalid input {} at 0 for rotation: please use x, y, or z.",
-                                    rot_axis
+                                    "ERROR: Invalid input {} at {} for rotation: please use x, y, or z.",
+                                    rot_axis, error_message
                                 );
                             }
                         }
@@ -221,7 +221,7 @@ pub fn parse(fname: &str) {
                     Rule::SPHERE_SDDDD => {
                         // println!("{:?}", command);
                         let mut command_contents = command.into_inner();
-                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
+                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).expect("Unable to get lighting constants");
                         polygons.add_sphere(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
@@ -270,7 +270,7 @@ pub fn parse(fname: &str) {
                     }
                     Rule::BOX_SDDDDDD => {
                         let mut command_contents = command.into_inner();
-                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
+                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).expect("Unable to get lighting constants");
                         polygons.add_box(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
@@ -322,7 +322,7 @@ pub fn parse(fname: &str) {
                     }
                     Rule::TORUS_SDDDDD => {
                         let mut command_contents = command.into_inner();
-                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).unwrap();
+                        let lighting_constants = constants_store.get(command_contents.next().unwrap().as_str()).expect("Unable to get lighting constants");
                         polygons.add_torus(
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
