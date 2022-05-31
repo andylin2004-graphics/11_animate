@@ -36,7 +36,7 @@ pub mod consts {
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 && args[1] == "art"{
-        parse("robot.mdl");
+        parse("face.mdl");
     }else{
         let time = Instant::now();
         parse("simple_anim.mdl");
