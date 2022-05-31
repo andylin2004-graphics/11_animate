@@ -164,7 +164,11 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             if let Some(knob_name) = command_contents.next(){
-                                *frames[frame_num].get(&*knob_name.as_str()).unwrap()
+                                if frames[frame_num].contains_key(knob_name.as_str()){
+                                    *frames[frame_num].get(&*knob_name.as_str()).expect(error_message)
+                                }else{
+                                    0.0
+                                }
                             }else{
                                 1.0
                             }
@@ -177,7 +181,11 @@ pub fn parse(fname: &str) {
                         let rot_axis = command_contents.next().unwrap().as_str();
                         let mut rot_amount: f32 = command_contents.next().unwrap().as_str().parse().expect(error_message);
                         if let Some(knob_name) = command_contents.next(){
-                            rot_amount *= *frames[frame_num].get(knob_name.as_str()).unwrap();
+                            rot_amount *= if frames[frame_num].contains_key(knob_name.as_str()){
+                                *frames[frame_num].get(knob_name.as_str()).expect(error_message)
+                            }else {
+                                0.0
+                            }
                         }
                         match rot_axis {
                             "x" => {
@@ -210,7 +218,11 @@ pub fn parse(fname: &str) {
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             command_contents.next().unwrap().as_str().parse().expect(error_message),
                             if let Some(knob_name) = command_contents.next(){
-                                *frames[frame_num].get(&*knob_name.as_str()).unwrap()
+                                if frames[frame_num].contains_key(knob_name.as_str()){
+                                    *frames[frame_num].get(&*knob_name.as_str()).expect(error_message)
+                                }else{
+                                    0.0
+                                }
                             }else{
                                 1.0
                             }
